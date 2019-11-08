@@ -1,0 +1,31 @@
+scrapeSearch <- function(searches,collectedInfo) {
+  subsetted<-data.frame(
+    Url = character(0),
+    Title = character(0),
+    Description = character(0))
+  for(i in 1:length(collectedInfo$Description))
+  {
+    chosen<-any(sapply(searches, function(x) grepl(x, survivalTaskViews[i,])))
+    if(chosen==TRUE){
+      subsetted<-rbind(subsetted,collectedInfo[i,])  
+    }
+    if(chosen==FALSE){
+      chosen2<-any(sapply(searches, function(x) grepl(x, survivalTaskViews[i,])))
+      if(chosen2==TRUE){
+        subsetted<-rbind(subsetted,collectedInfo[i,])  
+      }
+    }
+  }
+  return(subsetted)
+}
+
+
+survivalTaskViews<-readRDS("survivalTaskViews.RDS")
+lcstv<-data.frame(lapply(survivalTaskViews, function(v) {
+  if (is.character(v)) return(tolower(v))
+  else return(v)
+}))
+  
+
+searches<-c("non-proportional","nonproportional","regular","lasso","ridge","competing","leftcensored","left-censored","multistate","multi-state","inear regression")
+picked<-scrapeSearch(searches,lcstv)
