@@ -1,18 +1,25 @@
-scrapeSearch <- function(searches,collectedInfo) {
+scrapeSearch <- function(searches,LCCI,collectedInfo) {
   subsetted<-data.frame(
     Url = character(0),
     Title = character(0),
     Description = character(0))
-  for(i in 1:length(collectedInfo$Description))
+  for(i in 1:length(LCCI$Description))
   {
     chosen<-any(sapply(searches, function(x) grepl(x, survivalTaskViews[i,])))
     if(chosen==TRUE){
-      subsetted<-rbind(subsetted,collectedInfo[i,])  
+
+      pull<-collectedInfo[i,]
+      pull$Description<-gsub("[\r\n\t]", " ", collectedInfo[i,3])
+      pull$Description<-gsub("\\s+", " ", collectedInfo[i,3])
+      subsetted<-rbind(subsetted,pull)  
     }
     if(chosen==FALSE){
       chosen2<-any(sapply(searches, function(x) grepl(x, survivalTaskViews[i,])))
       if(chosen2==TRUE){
-        subsetted<-rbind(subsetted,collectedInfo[i,])  
+        pull<-collectedInfo[i,]
+        pull$Description<-gsub("[\r\n\t]", " ", collectedInfo[i,3])
+        pull$Description<-gsub("\\s+", " ", collectedInfo[i,3])
+        subsetted<-rbind(subsetted,pull)  
       }
     }
   }
@@ -27,5 +34,6 @@ lcstv<-data.frame(lapply(survivalTaskViews, function(v) {
 }))
   
 
-searches<-c("non-proportional","nonproportional","regular","lasso","ridge","competing","leftcensored","left-censored","multistate","multi-state","inear regression")
-picked<-scrapeSearch(searches,lcstv)
+searches<-c("non-proportional","nonproportional","regular","lasso","ridge","competing","leftcensored","left-censored","multistate","multi-state","linear regression","penalized")
+picked<-scrapeSearch(searches,lcstv,survivalTaskViews)
+write.csv(picked,"survivalTaskViewsOfInterest.csv", row.names = FALSE)
